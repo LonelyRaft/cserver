@@ -3,14 +3,22 @@
 #define _SERVER_H
 
 #ifdef __cpluplus
-extern "C" {
+extern "C"
+{
 #endif // __cpluplus
 
-typedef struct server_t server_t;
+    int server_create();
+
+    int server_destroy();
+
+    int server_start();
+
+    int server_stop();
+
+    int server_pause();
 
 #ifdef __cpluplus
 }
 #endif // __cpluplus
 
 #endif //  _SERVER_H
-

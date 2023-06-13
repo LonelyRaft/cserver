@@ -1,14 +1,34 @@
 
 #include "server_t.h"
 #include <pthread.h>
-#include "thd_pool_t.h"
-//#include "list_t.h"
-#include "array_t.h"
+#include "queue_t.h"
 
 typedef struct server_t
 {
-    thd_pool_t *pool;
-    array_t *array;
-    pthread_mutex_t lock;
-}server_t;
+    queue_t *q;
+} server_t;
 
+int server_create()
+{
+    return 0;
+}
+
+int server_destroy()
+{
+    return 0;
+}
+
+int server_start()
+{
+    return 0;
+}
+
+int server_stop()
+{
+    return 0;
+}
+
+int server_pause()
+{
+    return 0;
+}

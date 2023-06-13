@@ -3,16 +3,31 @@
 #define _LIST_H
 
 #ifdef __cpluplus
-extern "C" {
+extern "C"
+{
 #endif // __cpluplus
 
-typedef struct list_data_op
-{
-    int (*copy)(void* _dest, void* _src);
-    int (*equal)(void* _a, void * _b);
-}list_data_op;
+#define DATA_COPY (int (*)(void *, const void *))
+#define DATA_EQUAL (int (*)(const void *, const void *))
+#define DATA_PROCESS (int (*)(void *))
 
-typedef struct list_t list_t;
+    typedef struct list_data_op
+    {
+        int (*copy)(void *_dest, const void *_src);
+        int (*equal)(const void *_a, const void *_b);
+        int (*process)(void *_data);
+    } list_data_op;
+
+    typedef struct list_t list_t;
+
+    list_t *list_create();
+
+    int list_clear(list_t *_list);
+
+    void list_destroy(list_t *_list);
+
+    int list_set_operation(
+        list_t *_list, const list_data_op *_op);
 
 #ifdef __cpluplus
 }
