@@ -151,11 +151,11 @@ int thd_pool_find(
 
 int thd_pool_get(
     thd_pool_t *_thd_pool,
-    int _idx, thd_t *_thd)
+    size_t _idx, thd_t *_thd)
 {
     int result = -2;
     if (_thd_pool == NULL || _thd == NULL ||
-        _idx < 0 || _idx >= _thd_pool->size)
+        _idx >= _thd_pool->size)
         return -1;
     pthread_mutex_lock(&_thd_pool->lock);
     if (_thd_pool->thds[_idx].id != 0)

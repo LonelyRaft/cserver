@@ -25,8 +25,8 @@ extern "C"
     typedef struct client_t
     {
         skt_t sktfd;
-        //    struct sockaddr_in addr;
         size_t length;
+        struct sockaddr_in addr;
     } client_t;
 
     int apply_operation(list_t *_list);
