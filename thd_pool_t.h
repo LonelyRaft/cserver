@@ -28,7 +28,7 @@ extern "C"
 
     int thd_pool_get(
         thd_pool_t *_thd_pool,
-        int _idx, thd_t *_thd);
+        size_t _idx, thd_t *_thd);
 
     int thd_pool_add(
         thd_pool_t *_thd_pool,

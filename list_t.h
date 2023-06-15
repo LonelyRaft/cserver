@@ -26,6 +26,10 @@ extern "C"
 
     void list_destroy(list_t *_list);
 
+    size_t list_count(list_t *_list);
+
+    int list_append(list_t *_list, void* _data);
+
     int list_set_operation(
         list_t *_list, const list_data_op *_op);
 
