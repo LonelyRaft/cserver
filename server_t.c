@@ -4,6 +4,7 @@
 #include "client_t.h"
 #include "thd_pool_t.h"
 #include "list_t.h"
+#include "clog.h"
 
 typedef struct server_t
 {

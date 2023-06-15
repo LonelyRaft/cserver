@@ -1,19 +1,23 @@
+
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-// #include "nd_pool_t.h"
+#include "xlog.h"
+ #include "nd_pool_t.h"
+#include "server_t.h"
 
 int main()
 {
-    //    node_pool_init(3);
+    xlog_init();
+    node_pool_init(1024);
 
-    void *data1 = malloc(16);
+    server_create();
+    server_start();
+    sleep(100);
+    server_stop();
+    server_destroy();
 
-    void *data2 = malloc(16);
-
-    free(data1);
-
-    free(data2);
-
-    //    node_pool_deinit();
+    node_pool_deinit();
+    xlog_deinit();
     return 0;
 }

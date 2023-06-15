@@ -12,6 +12,13 @@ extern "C"
         struct node_t *next;
     } node_t;
 
+    typedef struct dnode_t
+    {
+        void* data;
+        struct dnode_t *left;
+        struct dnode_t *right;
+    }dnode_t;
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus

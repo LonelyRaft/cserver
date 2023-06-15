@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 
 project(server LANGUAGES C)
 
+add_subdirectory(clog)
+add_subdirectory(dsdef)
+
 set(TARGET_NAME server)
 add_executable(${TARGET_NAME}
     ".gitignore"
@@ -13,3 +16,8 @@ target_sources(
     ${TARGET_NAME} PRIVATE
     ${SRC_LIST}
 )
+target_link_libraries(
+    ${TARGET_NAME} PRIVATE
+    clog ds
+)
+

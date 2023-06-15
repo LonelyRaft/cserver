@@ -1,17 +1,27 @@
 
 #include "client_t.h"
 
-static int copy(client_t *_dest, client_t *_src)
+static client_t* client_create(client_t *_client)
+{
+    return NULL;
+}
+
+static int client_destroy(client_t *_client)
 {
     return 0;
 }
 
-static int equal(const client_t *_a, const client_t *_b)
+static int client_copy(client_t *_dest, client_t *_src)
 {
     return 0;
 }
 
-static int process(client_t *_data)
+static int client_cmp(const client_t *_a, const client_t *_b)
+{
+    return 0;
+}
+
+static int client_process(client_t *_data)
 {
     return 0;
 }
