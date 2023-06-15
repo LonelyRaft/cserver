@@ -3,7 +3,7 @@
 #define _LIST_H
 
 #include <stddef.h>
-#include "datadef.h"
+#include "datatype_t.h"
 
 #ifdef __cpluplus
 extern "C"
@@ -12,7 +12,7 @@ extern "C"
 
     typedef struct list_t list_t;
 
-    list_t *list_create();
+    list_t *list_create(const data_op *_op);
 
     int list_clear(list_t *_list);
 
@@ -20,14 +20,19 @@ extern "C"
 
     size_t list_count(const list_t *_list);
 
-    int list_append(list_t *_list, void* _data);
+    int list_push(list_t *_list, void *_data);
 
-    int list_remove(list_t *_list, void* _data);
+    void *list_top(const list_t *_list);
 
-    int list_set_operation(
-        list_t *_list, const data_op *_op);
+    void *list_pop(list_t *_list);
 
-    void list_process_data(const list_t *_list);
+    int list_remove(list_t *_list, void *_data);
+
+    void *list_begin(list_t *_list);
+
+    void *list_next(list_t *_list);
+
+    void *list_end(list_t *_list);
 
 #ifdef __cpluplus
 }

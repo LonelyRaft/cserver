@@ -7,13 +7,15 @@
 
 typedef struct list_t
 {
+    const data_op *op;
     node_t *head;
     node_t *tail;
+    node_t *it;
     size_t count;
     pthread_mutex_t *lock;
 } list_t;
 
-list_t *list_create()
+list_t *list_create(const data_op *_op)
 {
     size_t length =
         sizeof(list_t) + sizeof(node_t) +
@@ -22,8 +24,10 @@ list_t *list_create()
     if (list == NULL)
         return NULL;
     memset(list, 0, length);
+    list->op = _op;
     list->head = (node_t *)(list + 1);
-    list->lock = (pthread_mutex_t*)(list->head + 1);
+    list->tail = list->head;
+    list->lock = (pthread_mutex_t *)(list->head + 1);
     pthread_mutex_init(list->lock, NULL);
     return list;
 }
@@ -64,26 +68,6 @@ int list_clear(list_t *_list)
     return result;
 }
 
-int list_set_operation(
-    list_t *_list, const data_op *_op)
-{
-    int result = -1;
-    if (_list == NULL || _op == NULL)
-        return result;
-    pthread_mutex_lock(_list->lock);
-    if (_list->op == NULL)
-    {
-        _list->op = _op;
-        result = 0;
-    }
-    else
-    {
-        result = -2;
-    }
-    pthread_mutex_lock(_list->lock);
-    return result;
-}
-
 size_t list_count(const list_t *_list)
 {
     size_t result = 0;
@@ -95,7 +79,7 @@ size_t list_count(const list_t *_list)
     return result;
 }
 
-int list_append(list_t *_list, void *_data)
+int list_push(list_t *_list, void *_data)
 {
     if (_list == NULL || _data == NULL)
         return -1;
@@ -118,6 +102,38 @@ int list_append(list_t *_list, void *_data)
     _list->count++;
     pthread_mutex_unlock(_list->lock);
     return 0;
+}
+
+void *list_pop(list_t *_list)
+{
+    void *data = NULL;
+    if (_list == NULL)
+        return data;
+    do
+    {
+        pthread_mutex_lock(_list->lock);
+        node_t *top = _list->head->next;
+        if (top == NULL)
+            break;
+        data = top->data;
+        _list->head->next = top->next;
+        node_release(top);
+        _list->count--;
+    } while (0);
+    pthread_mutex_unlock(_list->lock);
+    return data;
+}
+
+void *list_top(const list_t *_list)
+{
+    if (_list == NULL)
+        return NULL;
+    pthread_mutex_lock(_list->lock);
+    node_t *top = _list->head->next;
+    pthread_mutex_unlock(_list->lock);
+    if (top == NULL)
+        return NULL;
+    return top->data;
 }
 
 int list_remove(list_t *_list, void *_data)
@@ -155,17 +171,44 @@ int list_remove(list_t *_list, void *_data)
     return 0;
 }
 
-void list_process_data(const list_t *_list)
+void *list_begin(list_t *_list)
 {
-    if (_list == NULL || _list->op == NULL ||
-        _list->op->process == NULL)
-        return;
+    void *item = NULL;
+    if (_list == NULL)
+        return item;
     pthread_mutex_lock(_list->lock);
-    node_t *node = _list->head->next;
-    while (node)
-    {
-        _list->op->process(node->data);
-        node = node->next;
-    }
+    _list->it = _list->head->next;
+    item = _list->it->data;
     pthread_mutex_unlock(_list->lock);
+    return item;
+}
+
+void *list_next(list_t *_list)
+{
+    void *item = NULL;
+    if (_list == NULL)
+        return item;
+    do
+    {
+        pthread_mutex_lock(_list->lock);
+        if (_list->it == NULL)
+            break;
+        _list->it = _list->it->next;
+        if (_list->it == NULL)
+            break;
+        item = _list->it->data;
+    } while (0);
+    pthread_mutex_unlock(_list->lock);
+    return item;
+}
+
+void *list_end(list_t *_list)
+{
+    void *item = NULL;
+    if (_list == NULL)
+        return item;
+    pthread_mutex_lock(_list->lock);
+    item = _list->tail->data;
+    pthread_mutex_unlock(_list->lock);
+    return item;
 }

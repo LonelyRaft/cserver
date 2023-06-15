@@ -83,7 +83,7 @@ static int server_recv_clnt(server_t *_server, skt_t sktfd)
                 continue;
             }
             dest_thd.entry = _server->clnt_entry;
-            dest_thd.arg = list_create();
+            dest_thd.arg = client_list_create();
             if (dest_thd.arg == NULL)
             {
                 closesocket(sktfd);
@@ -113,7 +113,7 @@ static int server_recv_clnt(server_t *_server, skt_t sktfd)
         new_clnt->sktfd = skt_clnt;
         new_clnt->length = length;
         new_clnt->addr = addr;
-        list_append((list_t *)dest_thd.arg, new_clnt);
+        list_push((list_t *)dest_thd.arg, new_clnt);
     }
     return 0;
 }

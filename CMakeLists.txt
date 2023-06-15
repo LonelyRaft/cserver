@@ -20,4 +20,10 @@ target_link_libraries(
     ${TARGET_NAME} PRIVATE
     clog ds
 )
-
+message(${CMAKE_HOST_SYSTEM_NAME})
+if(${CMAKE_HOST_SYSTEM_NAME} MATCHES Windows)
+    target_link_libraries(
+        ${TARGET_NAME} PRIVATE
+        ws2_32
+    )
+endif()

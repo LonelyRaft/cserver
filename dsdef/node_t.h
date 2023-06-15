@@ -14,10 +14,10 @@ extern "C"
 
     typedef struct dnode_t
     {
-        void* data;
+        void *data;
         struct dnode_t *left;
         struct dnode_t *right;
-    }dnode_t;
+    } dnode_t;
 
 #ifdef __cplusplus
 }

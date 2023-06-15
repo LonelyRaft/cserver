@@ -22,6 +22,18 @@ extern "C"
 
     size_t node_available();
 
+    int dnode_pool_init(size_t _size);
+
+    void dnode_pool_deinit();
+
+    dnode_t *dnode_lease();
+
+    int dnode_release(dnode_t *_node);
+
+    size_t dnode_num();
+
+    size_t dnode_available();
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus

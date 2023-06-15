@@ -29,7 +29,9 @@ extern "C"
         struct sockaddr_in addr;
     } client_t;
 
-    int apply_operation(list_t *_list);
+    list_t* client_list_create();
+
+    int client_run(client_t* _client);
 
 #ifdef __cplusplus
 }
