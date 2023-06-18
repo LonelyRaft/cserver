@@ -22,6 +22,7 @@ typedef struct server_addr
 #include <winsock2.h>
 
 typedef SOCKET skt_t;
+typedef int socklen_t;
 #endif
 
 #ifdef __linux__

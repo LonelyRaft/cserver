@@ -6,56 +6,70 @@
 #include <fcntl.h>
 #include "sktop.h"
 #include "client_t.h"
-#include "thd_pool_t.h"
+#include "task_t.h"
 #include "list_t.h"
 #include "xlog.h"
 
 typedef struct server_t
 {
+    pthread_t task_id;
+    void *task_ret;
     unsigned short port;
     unsigned char run;
     unsigned char interval;
-    thd_pool_t *thds;
+    task_vec_t *thds;
 } server_t;
 
 static list_t *server_q_find(server_t *_server)
 {
-    if (thd_pool_full(_server->thds)) {
-        thd_t dest_thd = {0};
-        size_t thd_cnt = thd_pool_count(_server->thds);
-        for (size_t idx = 0; idx < thd_cnt; idx++) {
-            thd_t curr_thd = {0};
-            if (thd_pool_get(_server->thds, idx, &curr_thd)) {
+    int full_ret = task_vec_full(_server->thds);
+    if (full_ret == 1) {
+        size_t vecsz =
+            task_vec_capacity(_server->thds);
+        if (vecsz == 0) {
+            return NULL;
+        }
+        size_t idx = 1;
+        const task_t *dest =
+            task_vec_at(_server->thds, 0);
+        while (idx < vecsz) {
+            const task_t *curr =
+                task_vec_at(_server->thds, idx);
+            if (curr == NULL ||
+                curr->entry != client_run) {
                 continue;
             }
-            size_t curr_num = list_count((list_t *)curr_thd.arg);
-            size_t dest_num = list_count((list_t *)dest_thd.arg);
+            size_t curr_num =
+                list_count((list_t *)curr->arg);
+            size_t dest_num =
+                list_count((list_t *)dest->arg);
             if (dest_num > curr_num) {
-                dest_thd = curr_thd;
+                dest = curr;
             }
+            idx++;
         }
-        if (dest_thd.arg != NULL) {
+        if (dest->arg != NULL) {
             xlogInfo("Find Dest Client Queue");
         } else {
             xlogError("Don't Find Dest Client Queue");
         }
-        return (list_t *)dest_thd.arg;
+        return (list_t *)dest->arg;
+    } else if (full_ret != 0) {
+        return NULL;
     } else {
-        thd_t new_thd = {0};
-        new_thd.entry = (void *(*)(void *))client_run;
-        new_thd.arg = client_list_create();
-        if (new_thd.arg == NULL) {
-            xlogError("Create Cleint List Failed!");
+        list_t *clnt_queue = client_list_create();
+        if (clnt_queue == NULL) {
+            xlogError("Create Client Queue Failed!");
             return NULL;
         }
-        if (pthread_create(&new_thd.id, NULL, new_thd.entry, new_thd.arg)) {
-            list_destroy((list_t *)new_thd.arg);
-            xlogError("Create Client Thread Failed!");
+        if (task_vec_push(_server->thds,
+                client_run, clnt_queue)) {
+            list_destroy(clnt_queue);
+            xlogError("Push Client Task Failed!");
             return NULL;
         }
-        thd_pool_add(_server->thds, new_thd);
         xlogInfo("Create a Client Thread");
-        return (list_t *)new_thd.arg;
+        return clnt_queue;
     }
 }
 
@@ -66,14 +80,22 @@ static int server_recv_clnt(
         sktfd == INVALID_SOCKET) {
         return -1;
     }
+    TIMEVAL tmout;
+    tmout.tv_sec = 1;
+    tmout.tv_usec = 0;
     fd_set read_fds;
     FD_ZERO(&read_fds);
     FD_SET(sktfd, &read_fds);
     while (_server->run) {
-        int result = select(sktfd + 1, &read_fds, NULL, NULL, NULL);
+        int result = select(sktfd + 1, &read_fds, NULL, NULL, &tmout);
         if (result < 0) {
             xlogError("Select Error!");
             return -2;
+        }
+        if (result == 0) {
+            tmout.tv_sec = 1;
+            tmout.tv_usec = 0;
+            continue;
         }
         if (!FD_ISSET(sktfd, &read_fds)) {
             continue;
@@ -109,6 +131,8 @@ static int server_recv_clnt(
             server_addr.ipaddr.bs[3], server_addr.ipaddr.bs[2],
             server_addr.ipaddr.bs[1], server_addr.ipaddr.bs[0],
             server_addr.port);
+        tmout.tv_sec = 1;
+        tmout.tv_usec = 0;
     }
     return 0;
 }
@@ -118,8 +142,8 @@ static void *server_run(server_t *_server)
     if (_server == NULL) {
         return (void *)(-1);
     }
+    skt_t sktfd = INVALID_SOCKET;
     while (_server->run) {
-        skt_t sktfd = INVALID_SOCKET;
         sktfd = socket(AF_INET,
                 SOCK_STREAM, IPPROTO_TCP);
         if (sktfd == INVALID_SOCKET) {
@@ -152,6 +176,10 @@ static void *server_run(server_t *_server)
             }
         }
     }
+    if (sktfd != INVALID_SOCKET) {
+        socket_close(sktfd);
+    }
+    xlogInfo("Server Thread Exit!");
     return NULL;
 }
 
@@ -164,9 +192,10 @@ server_t *server_create(unsigned short _port)
         return server;
     }
     server->port = _port;
-    server->run = 1;
+    server->run = 0;
+    server->interval = 1;
     server->thds =
-        thd_pool_create();
+        task_vec_create();
     if (server->thds == NULL) {
         xlogError("Create Client Thread Pool Failed!");
         free(server);
@@ -182,19 +211,7 @@ int server_destroy(server_t *_server)
         xlogWarn("This Is a Null Server!");
         return 0;
     }
-    // stop listen thread
-    _server->run = 0;
-    // stop client thread
-    size_t thdcnt = thd_pool_count(_server->thds);
-    size_t thdidx = 0;
-    while (thdidx < thdcnt) {
-        thd_t todel = {0};
-        thd_pool_get(_server->thds, thdidx, &todel);
-        list_destroy((list_t*)todel.arg);
-        pthread_cancel(todel.id);
-        thdidx++;
-    }
-    thd_pool_destroy(_server->thds);
+    server_stop(_server);
     unsigned short port = _server->port;
     free(_server);
     xlogInfo("Free Server With Port %d", port);
@@ -207,8 +224,8 @@ int server_start(server_t *_server)
         xlogError("This Is a Null Server!");
         return -1;
     }
-    pthread_t thd = 0;
-    pthread_create(&thd, NULL,
+    _server->run = 1;
+    pthread_create(&_server->task_id, NULL,
         (void *(*)(void *))server_run, _server);
     xlogInfo("Start Server(%d)", _server->port);
     return 0;
@@ -216,11 +233,32 @@ int server_start(server_t *_server)
 
 int server_stop(server_t *_server)
 {
-    return 0;
-}
-
-int server_pause(server_t *_server)
-{
+    if (_server == NULL) {
+        xlogWarn("This Is a Null Server!");
+        return 0;
+    }
+    // stop listen thread
+    _server->run = 0;
+    // stop client thread
+    size_t vecsz =
+        task_vec_capacity(_server->thds);
+    size_t idx = 0;
+    while (idx < vecsz) {
+        const task_t *task =
+            task_vec_at(_server->thds, idx);
+        if (task == NULL ||
+            task->entry != client_run) {
+            idx++;
+            continue;
+        }
+        task_vec_remove(_server->thds, idx);
+        pthread_join(task->id, NULL);
+        list_destroy((list_t *)task->arg);
+        idx++;
+    }
+    if (_server->task_id)
+        pthread_join(_server->task_id,
+            &_server->task_ret);
     return 0;
 }
 

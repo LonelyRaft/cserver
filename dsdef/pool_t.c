@@ -41,6 +41,7 @@ static int pool_set_ele_flag(pool_t *_pool, size_t _idx)
     unsigned char bit_mask = (0x01 << bit_idx);
     unsigned char flags = _pool->flags[byte_idx];
     flags ^= bit_mask;
+    _pool->flags[byte_idx] = flags;
     return flags;
 }
 

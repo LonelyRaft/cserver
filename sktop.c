@@ -97,7 +97,8 @@ int socket_reuseaddr(skt_t _sktfd)
 
 int socket_unblock(skt_t _sktfd)
 {
-    return 0;
+    u_long noblock = 1;
+    return ioctlsocket(_sktfd, FIONBIO, &noblock);
 }
 
 int socket_inaddr2saddr(

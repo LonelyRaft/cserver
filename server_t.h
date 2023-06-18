@@ -17,8 +17,6 @@ extern "C"
 
     int server_stop(server_t *_server);
 
-    int server_pause(server_t *_server);
-
     int server_running(server_t *_server);
 
 #ifdef __cpluplus

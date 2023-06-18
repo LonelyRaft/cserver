@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include "list_t.h"
 #include "sktop.h"
+#include "task_t.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -18,9 +19,13 @@ typedef struct client_t
     struct sockaddr_in addr;
 } client_t;
 
+int client_pool_create(size_t _capacity);
+
+void client_pool_destroy();
+
 list_t *client_list_create();
 
-void *client_run(list_t *_queue);
+void *client_run(task_t *_task);
 
 #ifdef __cplusplus
 }
