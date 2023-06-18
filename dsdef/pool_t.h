@@ -60,7 +60,7 @@ extern "C"
      *  @_node: the element to be release
      *  @return: 0 is success
      *********************************************/
-    int ele_release(pool_t *_pool, void *_node);
+    int ele_release(pool_t *_pool, void *_ele);
 
 #ifdef __cpluplus
 }

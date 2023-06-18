@@ -4,22 +4,12 @@
 
 #include <stddef.h>
 #include "list_t.h"
+#include "sktop.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif // __cplusplus
-
-#ifdef _WIN32
-#include <winsock2.h>
-
-typedef SOCKET skt_t;
-#endif
-
-#ifdef __linux__
-#include <netinet/in.h>
-typedef int skt_t;
-#endif
 
 typedef struct client_t
 {
@@ -30,7 +20,7 @@ typedef struct client_t
 
 list_t *client_list_create();
 
-void *client_run(client_t *_client);
+void *client_run(list_t *_queue);
 
 #ifdef __cplusplus
 }
