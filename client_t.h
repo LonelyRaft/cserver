@@ -30,7 +30,7 @@ typedef struct client_t
 
 list_t *client_list_create();
 
-int client_run(client_t *_client);
+void *client_run(client_t *_client);
 
 #ifdef __cplusplus
 }

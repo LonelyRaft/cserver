@@ -21,7 +21,7 @@ static int client_cmp(const client_t *_a, const client_t *_b)
     return 0;
 }
 
-list_t* client_list_create()
+list_t *client_list_create()
 {
     static const data_op client_op = {
         DATA_CREATE client_create,
@@ -32,7 +32,7 @@ list_t* client_list_create()
     return list_create(&client_op);
 }
 
-int client_run(client_t* _client)
+void *client_run(client_t *_client)
 {
-    return 0;
+    return NULL;
 }
