@@ -1,5 +1,6 @@
 
 #include "server_t.h"
+#include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include "client_t.h"
@@ -7,14 +8,17 @@
 #include "list_t.h"
 #include "xlog.h"
 
-#ifndef INVALID_SOCKET
-    #define INVALID_SOCKET (-1)
-#endif // INVALID_SOCKET
-
 typedef union ip4addr_t {
-    u_char bs[4];
-    uint32_t addr;
+    unsigned char bs[sizeof(unsigned int)];
+    unsigned int  addr;
 } ip4addr_t;
+
+typedef struct server_addr
+{
+    unsigned short family;
+    unsigned short port;
+    ip4addr_t ipaddr;
+} saddr_t;
 
 typedef struct server_t
 {
@@ -22,6 +26,125 @@ typedef struct server_t
     unsigned char run;
     thd_pool_t *thds;
 } server_t;
+
+
+
+#ifdef __linux__
+#include <sys/socket.h>
+
+#ifndef INVALID_SOCKET
+    #define INVALID_SOCKET (-1)
+#endif // INVALID_SOCKET
+
+static int socket_close(skt_t _sktfd)
+{
+    return close(_sktfd);
+}
+
+static int socket_reuseaddr(skt_t _sktfd)
+{
+    int resue = 1;
+    return setsockopt(sktfd, SOL_SOCKET,
+            SO_REUSEADDR, &resue, sizeof(resue));
+}
+
+static int socket_inaddr2saddr(
+    const struct sockaddr_in *_inaddr,
+    saddr_t *_saddr)
+{
+    if (_inaddr == NULL ||
+        _saddr == NULL) {
+        return -1;
+    }
+    _saddr->family = _inaddr->sin_family;
+    _saddr->port = _inaddr->sin_port;
+    _saddr->ipaddr.addr =
+        _inaddr->sin_addr.s_addr;
+    return 0;
+}
+
+static int socket_saddr2inaddr(
+    const saddr_t *_saddr,
+    struct sockaddr_in *_inaddr)
+{
+    if (_saddr == NULL ||
+        _inaddr == NULL) {
+        return -1;
+    }
+    memset(_inaddr, 0, sizeof(struct sockaddr_in));
+    _inaddr->sin_family = _saddr->family;
+    _inaddr->sin_port = _saddr->port;
+    _inaddr->sin_addr.s_addr =
+        _saddr->ipaddr.addr;
+    return 0;
+}
+
+#endif // __linux__
+
+#ifdef _WIN32
+
+#ifdef __GNUC__
+__attribute__((constructor))
+static void soket_init()
+{
+    WORD version  = MAKEWORD(2, 2);
+    WSADATA data;
+    WSAStartup(version, &data);
+}
+__attribute__((destructor))
+static void socket_deinit()
+{
+    WSACleanup();
+}
+#endif // __GNUC__
+
+typedef int socklen_t;
+
+static int socket_close(skt_t _sktfd)
+{
+    return closesocket(_sktfd);
+}
+
+static int socket_reuseaddr(skt_t _sktfd)
+{
+    BOOL opt = TRUE;
+    return setsockopt(
+            _sktfd, SOL_SOCKET, SO_REUSEADDR,
+            (char *)&opt, sizeof(BOOL));
+}
+
+static int socket_inaddr2saddr(
+    const struct sockaddr_in *_inaddr,
+    saddr_t *_saddr)
+{
+    if (_inaddr == NULL ||
+        _saddr == NULL) {
+        return -1;
+    }
+    _saddr->family = _inaddr->sin_family;
+    _saddr->port = _inaddr->sin_port;
+    _saddr->ipaddr.addr =
+        _inaddr->sin_addr.S_un.S_addr;
+    return 0;
+}
+
+static int socket_saddr2inaddr(
+    const saddr_t *_saddr,
+    struct sockaddr_in *_inaddr)
+{
+    if (_saddr == NULL ||
+        _inaddr == NULL) {
+        return -1;
+    }
+    memset(_inaddr, 0, sizeof(struct sockaddr_in));
+    _inaddr->sin_family = _saddr->family;
+    _inaddr->sin_port = _saddr->port;
+    _inaddr->sin_addr.S_un.S_addr =
+        _saddr->ipaddr.addr;
+    return 0;
+}
+
+#endif // _WIN32
 
 static void *server_run(server_t *_server);
 
@@ -92,11 +215,6 @@ int server_running(server_t *_server)
         return 0;
     }
     return _server->run;
-}
-
-static int server_q_push(
-    list_t *_server, client_t *_client)
-{
 }
 
 static list_t *server_q_find(server_t *_server)
@@ -172,44 +290,32 @@ static int server_recv_clnt(
                 return -4;
             }
             ip4addr_t clnt_ipaddr;
+            clnt_ipaddr.addr = 0;
+            client_t new_clnt;
+            new_clnt.sktfd = clnt_fd;
+            new_clnt.addr = addr;
+            new_clnt.length = length;
+            list_t *queue = server_q_find(_server);
+            if (queue == NULL) {
+                socket_close(clnt_fd);
+                continue;
+            }
 #ifdef _WIN32
-            clnt_ipaddr.addr = addr.sin_addr.S_un.s_addr;
-#endif // _WIN32
+            clnt_ipaddr.addr = addr.sin_addr.S_un.S_addr;
+#endif
 #ifdef __linux__
             clnt_ipaddr.addr = addr.sin_addr.s_addr;
-#endif // __linux__
+#endif
             xlogInfo("Accept Client: "
                 "{ip:\"%03d.%03d.%03d.%03d\", "
                 "port:%05d}",
                 clnt_ipaddr.bs[0], clnt_ipaddr.bs[1],
                 clnt_ipaddr.bs[2], clnt_ipaddr.bs[3],
                 addr.sin_port);
-            client_t new_clnt;
-            new_clnt.sktfd = clnt_fd;
-            new_clnt.addr = addr;
-            new_clnt.length = length;
-            list_t *queue = server_q_find(_server);
-#ifdef _WIN32
-            if (queue == NULL) {
-                closesocket(clnt_fd);
-                continue;
-            }
-#endif
-#ifdef __linux__
-            if (queue == NULL) {
-                close(clnt_fd);
-                continue;
-            }
-#endif
-            xlogInfo("Append Client To Thread %d", dest_thd.id);
         }
     }
+    return 0;
 }
-
-#ifdef __linux__
-    #include <unistd.h>
-    #include <sys/socket.h>
-#endif // __linux__
 
 static void *server_run(server_t *_server)
 {
@@ -224,53 +330,28 @@ static void *server_run(server_t *_server)
             sleep(1);
             continue;
         }
-#ifdef _WIN32
-        BOOL opt = TRUE;
-        setsockopt(
-            sktfd, SOL_SOCKET, SO_REUSEADDR,
-            (char *)&opt, sizeof(BOOL));
-#endif //  _WIN32
-#ifdef __linux__
-        int resue = 1;
-        setsockopt(sktfd, SOL_SOCKET,
-            SO_REUSEADDR, &resue, sizeof(resue));
-#endif // __linux__
+        socket_reuseaddr(sktfd);
         struct sockaddr_in addr = {0};
         addr.sin_family = AF_INET;
         addr.sin_addr.s_addr = INADDR_ANY;
         addr.sin_port = htons(_server->port);
         if (bind(sktfd, (struct sockaddr *)&addr,
                 sizeof(struct sockaddr))) {
-            close(sktfd);
+            socket_close(sktfd);
             sleep(1);
             continue;
         }
         if (listen(sktfd, SOMAXCONN)) {
-            close(sktfd);
+            socket_close(sktfd);
             sleep(1);
             continue;
         }
         while (_server->run) {
             if (server_recv_clnt(_server, sktfd)) {
-                close(sktfd);
+                socket_close(sktfd);
                 break;
             }
         }
     }
     return NULL;
 }
-
-#if defined(__GNUC__) && defined(_WIN32)
-__attribute__((constructor))
-void soket_init()
-{
-    WORD version  = MAKEWORD(2, 2);
-    WSADATA data;
-    WSAStartup(version, &data);
-}
-__attribute__((destructor))
-void socket_deinit()
-{
-    WSACleanup();
-}
-#endif // __GNUC__ && _WIN32
