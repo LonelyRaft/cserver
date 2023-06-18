@@ -89,72 +89,94 @@ int server_running(server_t *_server)
 
 static int server_recv_clnt(server_t *_server, skt_t sktfd)
 {
-    while (_server->run) {
-        int length = 0;
-        struct sockaddr_in addr = {0};
-        skt_t skt_clnt = accept(
-                sktfd, (struct sockaddr *)&addr, &length);
-        if (skt_clnt == INVALID_SOCKET) {
-            xlogWarn("Accept Client Failed!");
-            return -1;
-        }
-        xlogInfo(
-            "Accept Client: {ip:\"%03d.%03d.%03d.%03d\", port:%05d}",
-            addr.sin_addr.S_un.S_un_b.s_b1,
-            addr.sin_addr.S_un.S_un_b.s_b2,
-            addr.sin_addr.S_un.S_un_b.s_b3,
-            addr.sin_addr.S_un.S_un_b.s_b4,
-            addr.sin_port);
-        thd_t dest_thd = {0};
-        if (thd_pool_full(_server->thds)) {
-            size_t thd_cnt = thd_pool_count(_server->thds);
-            thd_t dest_thd = {0};
-            for (size_t idx = 0; idx < thd_cnt; idx++) {
-                thd_t curr_thd = {0};
-                if (thd_pool_get(_server->thds, idx, &curr_thd)) {
-                    continue;
-                }
-                size_t curr_num = list_count((list_t *)curr_thd.arg);
-                size_t dest_num = list_count((list_t *)dest_thd.arg);
-                if (dest_num > curr_num) {
-                    dest_thd = curr_thd;
-                }
-            }
-            xlogDebug("Find Appo Thread");
-        } else {
-            if (_server->clnt_entry == NULL) {
-                closesocket(skt_clnt);
-                continue;
-            }
-            dest_thd.entry = _server->clnt_entry;
-            dest_thd.arg = client_list_create();
-            if (dest_thd.arg == NULL) {
-                closesocket(sktfd);
-                continue;
-            }
-            pthread_create(&dest_thd.id, NULL, dest_thd.entry, dest_thd.arg);
-            if (dest_thd.id == 0) {
-                list_destroy((list_t *)dest_thd.arg);
-                dest_thd.arg = NULL;
-                closesocket(skt_clnt);
-                continue;
-            }
-            xlogDebug("Create a Client Thread");
-        }
-        client_t *new_clnt =
-            (client_t *)malloc(sizeof(client_t));
-        if (new_clnt == NULL) {
-            closesocket(skt_clnt);
-            xlogError("Alloc Memory Failed!");
-            continue;
-        }
-        memset(new_clnt, 0, sizeof(client_t));
-        new_clnt->sktfd = skt_clnt;
-        new_clnt->length = length;
-        new_clnt->addr = addr;
-        list_push((list_t *)dest_thd.arg, new_clnt);
-        xlogInfo("Appen Client To Thread %d", dest_thd.id);
+    if (_server == NULL ||
+        sktfd == INVALID_SOCKET) {
+        return -1;
     }
+    while (_server->run) {
+        fd_set readfds;
+        fd_set exceptfds;
+        FD_ZERO(&readfds);
+        FD_SET(sktfd, &readfds);
+        int result = select(sktfd + 1,
+                &readfds, NULL, &exceptfds, NULL);
+        if (result < 0) {
+            return -2;
+        } else if (result == 0) {
+            continue;
+        } else {
+            if (FD_ISSET(sktfd, &readfds)) {
+            }
+            if (FD_ISSET(sktfd, &exceptfds)) {
+            }
+        }
+    }
+    //    while (_server->run) {
+    //        int length = 0;
+    //        struct sockaddr_in addr = {0};
+    //        skt_t skt_clnt = accept(
+    //                sktfd, (struct sockaddr *)&addr, &length);
+    //        if (skt_clnt == INVALID_SOCKET) {
+    //            xlogWarn("Accept Client Failed!");
+    //            return -1;
+    //        }
+    //        xlogInfo(
+    //            "Accept Client: {ip:\"%03d.%03d.%03d.%03d\", port:%05d}",
+    //            addr.sin_addr.S_un.S_un_b.s_b1,
+    //            addr.sin_addr.S_un.S_un_b.s_b2,
+    //            addr.sin_addr.S_un.S_un_b.s_b3,
+    //            addr.sin_addr.S_un.S_un_b.s_b4,
+    //            addr.sin_port);
+    //        thd_t dest_thd = {0};
+    //        if (thd_pool_full(_server->thds)) {
+    //            size_t thd_cnt = thd_pool_count(_server->thds);
+    //            thd_t dest_thd = {0};
+    //            for (size_t idx = 0; idx < thd_cnt; idx++) {
+    //                thd_t curr_thd = {0};
+    //                if (thd_pool_get(_server->thds, idx, &curr_thd)) {
+    //                    continue;
+    //                }
+    //                size_t curr_num = list_count((list_t *)curr_thd.arg);
+    //                size_t dest_num = list_count((list_t *)dest_thd.arg);
+    //                if (dest_num > curr_num) {
+    //                    dest_thd = curr_thd;
+    //                }
+    //            }
+    //            xlogDebug("Find Appo Thread");
+    //        } else {
+    //            if (_server->clnt_entry == NULL) {
+    //                closesocket(skt_clnt);
+    //                continue;
+    //            }
+    //            dest_thd.entry = _server->clnt_entry;
+    //            dest_thd.arg = client_list_create();
+    //            if (dest_thd.arg == NULL) {
+    //                closesocket(sktfd);
+    //                continue;
+    //            }
+    //            pthread_create(&dest_thd.id, NULL, dest_thd.entry, dest_thd.arg);
+    //            if (dest_thd.id == 0) {
+    //                list_destroy((list_t *)dest_thd.arg);
+    //                dest_thd.arg = NULL;
+    //                closesocket(skt_clnt);
+    //                continue;
+    //            }
+    //            xlogDebug("Create a Client Thread");
+    //        }
+    //        client_t *new_clnt =
+    //            (client_t *)malloc(sizeof(client_t));
+    //        if (new_clnt == NULL) {
+    //            closesocket(skt_clnt);
+    //            xlogError("Alloc Memory Failed!");
+    //            continue;
+    //        }
+    //        memset(new_clnt, 0, sizeof(client_t));
+    //        new_clnt->sktfd = skt_clnt;
+    //        new_clnt->length = length;
+    //        new_clnt->addr = addr;
+    //        list_push((list_t *)dest_thd.arg, new_clnt);
+    //        xlogInfo("Appen Client To Thread %d", dest_thd.id);
+    //    }
     return 0;
 }
 
