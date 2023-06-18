@@ -9,6 +9,7 @@ extern clog_t *xlog;
 #define xlogWarn(fmt, ...) clog_warn(xlog, fmt, ##__VA_ARGS__)
 #define xlogInfo(fmt, ...) clog_info(xlog, fmt, ##__VA_ARGS__)
 #define xlogDebug(fmt, ...) clog_debug(xlog, fmt, ##__VA_ARGS__)
+#define xlogStatus(fmt, ...) clog_status(xlog, fmt, ##__VA_ARGS__)
 
 #ifdef __cplusplus
 extern "C" {

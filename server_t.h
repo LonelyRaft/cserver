@@ -7,15 +7,19 @@ extern "C"
 {
 #endif // __cpluplus
 
-    int server_create();
+    typedef struct server_t server_t;
 
-    int server_destroy();
+    server_t *server_create(unsigned short _port);
 
-    int server_start();
+    int server_destroy(server_t *_server);
 
-    int server_stop();
+    int server_start(server_t *_server);
 
-    int server_pause();
+    int server_stop(server_t *_server);
+
+    int server_pause(server_t *_server);
+
+    int server_running(server_t *_server);
 
 #ifdef __cpluplus
 }
