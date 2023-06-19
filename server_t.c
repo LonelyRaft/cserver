@@ -80,25 +80,24 @@ static int server_recv_clnt(
         sktfd == INVALID_SOCKET) {
         return -1;
     }
-    struct timeval tmout;
-    tmout.tv_sec = 1;
-    tmout.tv_usec = 0;
-    fd_set read_fds;
-    FD_ZERO(&read_fds);
-    FD_SET(sktfd, &read_fds);
     while (_server->run) {
+        fd_set read_fds;
+        FD_ZERO(&read_fds);
+        FD_SET(sktfd, &read_fds);
+        struct timeval tmout;
+        tmout.tv_sec = 1;
+        tmout.tv_usec = 0;
         int result = select(sktfd + 1, &read_fds, NULL, NULL, &tmout);
         if (result < 0) {
             xlogError("Select Error!");
             return -2;
         }
         if (result == 0) {
-            tmout.tv_sec = 1;
-            tmout.tv_usec = 0;
             continue;
         }
         if (!FD_ISSET(sktfd, &read_fds)) {
-            continue;
+            xlogError("Obtained Unexpected Results!");
+            return -3;
         }
         struct sockaddr_in addr = {0};
         socklen_t length = sizeof(struct sockaddr_in);
@@ -131,8 +130,6 @@ static int server_recv_clnt(
             server_addr.ipaddr.bs[3], server_addr.ipaddr.bs[2],
             server_addr.ipaddr.bs[1], server_addr.ipaddr.bs[0],
             server_addr.port);
-        tmout.tv_sec = 1;
-        tmout.tv_usec = 0;
     }
     return 0;
 }

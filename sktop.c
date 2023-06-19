@@ -1,5 +1,6 @@
 
 #include "sktop.h"
+#include <errno.h>
 
 #ifdef __linux__
 #include <sys/socket.h>
@@ -59,6 +60,24 @@ int socket_saddr2inaddr(
     _inaddr->sin_addr.s_addr =
         htonl(_saddr->ipaddr.addr);
     return 0;
+}
+
+int socket_check(skt_t _sktfd)
+{
+    if (_sktfd == INVALID_SOCKET) {
+        return 0;
+    }
+    char buffer = 0;
+    int ret = recv(_sktfd, &buffer, 1, MSG_PEEK);
+    if (ret == 1) {
+        return 1;
+    }
+    int error_code = errno;
+    if (error_code != EAGAIN &&
+        error_code != EINTR) {
+        return 0;
+    }
+    return 1;
 }
 #endif // __linux__
 
@@ -129,5 +148,9 @@ int socket_saddr2inaddr(
         htonl(_saddr->ipaddr.addr);
     return 0;
 }
-#endif // _WIN32
 
+int socket_check(skt_t _sktfd)
+{
+    return 0;
+}
+#endif // _WIN32

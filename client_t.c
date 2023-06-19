@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <errno.h>
 #include "pool_t.h"
 #include "client_t.h"
 #include "xlog.h"
@@ -96,28 +96,21 @@ void *client_run(task_t *_task)
     while (_task->working) {
         fd_set read;
         FD_ZERO(&read);
-        int maxfd = 0;
+        int maxfd = -1;
         client_t *clnt = (client_t *)list_begin(queue);
         while (clnt != NULL) {
-            if (clnt->sktfd == INVALID_SOCKET) {
+            if (!socket_check(clnt->sktfd)) {
+                list_remove(queue, clnt);
                 clnt = (client_t *)list_next(queue);
                 continue;
             }
-//             char buffer[16];
-//             int ret = recv(clnt->sktfd, buffer, 0, 0);
-//             int error_code = errno;
-//             if (ret < 0 && error_code != EINTR) {
-//                 list_remove(queue, clnt);
-//                 clnt = (client_t *)list_next(queue);
-//                 continue;
-//             }
             FD_SET(clnt->sktfd, &read);
             if (clnt->sktfd > maxfd) {
                 maxfd  = clnt->sktfd;
             }
             clnt = (client_t *)list_next(queue);
         }
-        if (maxfd == 0) {
+        if (maxfd < 0) {
             sleep(1);
             continue;
         }

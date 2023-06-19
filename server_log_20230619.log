@@ -1,0 +1,132 @@
+[2023-06-19 21:46:55] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:204]
+Create Server With Port 1024
+[2023-06-19 21:46:55] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:230]
+Start Server(1024)
+[2023-06-19 21:51:42] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:200]
+Create Server With Port 1024
+[2023-06-19 21:51:42] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:226]
+Start Server(1024)
+[2023-06-19 21:52:06] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 21:52:12] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:127]
+Accept Client: {ip:"192.168.2.2", port:54964}
+[2023-06-19 21:53:25] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 21:53:25] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:127]
+Accept Client: {ip:"192.168.2.2", port:54966}
+[2023-06-19 21:54:08] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:52]
+Find Dest Client Queue
+[2023-06-19 21:54:08] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:127]
+Accept Client: {ip:"192.168.2.2", port:54967}
+[2023-06-19 22:26:23] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:201]
+Create Server With Port 1024
+[2023-06-19 22:26:23] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:227]
+Start Server(1024)
+[2023-06-19 22:26:35] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:26:35] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:128]
+Accept Client: {ip:"192.168.2.2", port:55056}
+[2023-06-19 22:30:57] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:196]
+Create Server With Port 1024
+[2023-06-19 22:30:57] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:222]
+Start Server(1024)
+[2023-06-19 22:31:04] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:31:04] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55062}
+[2023-06-19 22:32:14] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:196]
+Create Server With Port 1024
+[2023-06-19 22:32:14] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:222]
+Start Server(1024)
+[2023-06-19 22:32:44] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:32:44] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55063}
+[2023-06-19 22:36:04] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:36:22] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55069}
+[2023-06-19 22:37:10] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:52]
+Find Dest Client Queue
+[2023-06-19 22:37:10] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55071}
+[2023-06-19 22:37:25] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:52]
+Find Dest Client Queue
+[2023-06-19 22:37:46] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55072}
+[2023-06-19 22:38:43] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:52]
+Find Dest Client Queue
+[2023-06-19 22:38:43] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55090}
+[2023-06-19 22:39:00] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:52]
+Find Dest Client Queue
+[2023-06-19 22:39:00] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55099}
+[2023-06-19 22:40:30] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:196]
+Create Server With Port 1024
+[2023-06-19 22:40:30] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:222]
+Start Server(1024)
+[2023-06-19 22:40:39] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:41:47] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55129}
+[2023-06-19 22:43:53] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:43:59] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55134}
+[2023-06-19 22:45:24] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:196]
+Create Server With Port 1024
+[2023-06-19 22:45:24] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:222]
+Start Server(1024)
+[2023-06-19 22:45:36] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:45:41] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55138}
+[2023-06-19 22:47:15] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:196]
+Create Server With Port 1024
+[2023-06-19 22:47:15] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:222]
+Start Server(1024)
+[2023-06-19 22:47:20] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:47:20] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55140}
+[2023-06-19 22:48:27] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:48:27] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:123]
+Accept Client: {ip:"192.168.2.2", port:55144}
+[2023-06-19 22:50:59] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:201]
+Create Server With Port 1024
+[2023-06-19 22:50:59] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:227]
+Start Server(1024)
+[2023-06-19 22:51:11] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 22:51:11] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:128]
+Accept Client: {ip:"192.168.2.2", port:55148}
+[2023-06-19 23:03:25] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:201]
+Create Server With Port 1024
+[2023-06-19 23:03:25] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:227]
+Start Server(1024)
+[2023-06-19 23:03:32] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 23:03:32] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:128]
+Accept Client: {ip:"192.168.2.2", port:55185}
+[2023-06-19 23:03:48] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 23:03:48] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:128]
+Accept Client: {ip:"192.168.2.2", port:55192}
+[2023-06-19 23:04:28] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:52]
+Find Dest Client Queue
+[2023-06-19 23:04:28] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:128]
+Accept Client: {ip:"192.168.2.2", port:55193}
+[2023-06-19 23:05:11] [Info] [server_log] [server_create] [/home/sparrow/Project/cserver/server_t.c:201]
+Create Server With Port 1024
+[2023-06-19 23:05:11] [Info] [server_log] [server_start] [/home/sparrow/Project/cserver/server_t.c:227]
+Start Server(1024)
+[2023-06-19 23:05:19] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 23:05:19] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:128]
+Accept Client: {ip:"192.168.2.2", port:55196}
+[2023-06-19 23:06:08] [Info] [server_log] [server_q_find] [/home/sparrow/Project/cserver/server_t.c:71]
+Create a Client Thread
+[2023-06-19 23:06:08] [Info] [server_log] [server_recv_clnt] [/home/sparrow/Project/cserver/server_t.c:128]
+Accept Client: {ip:"192.168.2.2", port:55204}
