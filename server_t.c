@@ -107,11 +107,11 @@ static int server_recv_clnt(
             xlogError("Accept Invalid Client Socket!");
             return -4;
         }
-        if (socket_unblock(clnt_fd)) {
-            socket_close(clnt_fd);
-            xlogError("Set Unblock for Client Failed!");
-            continue;
-        }
+//        if (socket_unblock(clnt_fd)) {
+//            socket_close(clnt_fd);
+//            xlogError("Set Unblock for Client Failed!");
+//            continue;
+//        }
         client_t new_clnt;
         new_clnt.sktfd = clnt_fd;
         new_clnt.addr = addr;
