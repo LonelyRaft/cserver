@@ -84,12 +84,56 @@ void *client_run(task_t *_task)
     }
     list_t *queue = (list_t *)_task->arg;
     while (_task->working) {
+        fd_set read;
+        FD_ZERO(&read);
+        int maxfd = 0;
         client_t *clnt = (client_t *)list_begin(queue);
         while (clnt != NULL) {
-            xlogStatus("Client Socket: %d\n", clnt->sktfd);
+            if (clnt->sktfd == INVALID_SOCKET) {
+                clnt = (client_t *)list_next(queue);
+                continue;
+            }
+            char buffer[16];
+            int ret = recv(clnt->sktfd, buffer, 0, 0);
+            if(ret < 0 && errno != EINTR)
+            {
+                list_remove(queue, clnt);
+                // 移除完之后，it 指向哪里？
+            }
+            FD_SET(clnt->sktfd, &read);
+            if (clnt->sktfd > maxfd) {
+                maxfd  = clnt->sktfd;
+            }
             clnt = (client_t *)list_next(queue);
         }
-        sleep(1);
+        struct timeval tmout;
+        tmout.tv_sec = 1;
+        tmout.tv_usec = 0;
+        int result = select(maxfd + 1, &read, NULL, NULL, &tmout);
+        if (result < 0) {
+            xlogError("");
+            break;
+        }
+        if (result == 0) {
+            continue;
+        }
+        clnt = (client_t *)list_begin(queue);
+        while (clnt != NULL) {
+            if (clnt->sktfd == INVALID_SOCKET ||
+                !FD_ISSET(clnt->sktfd, &read)) {
+                clnt = (client_t *)list_next(queue);
+                continue;
+            }
+            char buffer[256];
+            int length = recv(clnt->sktfd, buffer, 255, 0);
+            if (length < 0) {
+                clnt = (client_t *)list_next(queue);
+                //                list_remove(queue, clnt);
+                continue;
+            }
+            // protocol do something
+            clnt = (client_t *)list_next(queue);
+        }
     }
     xlogStatus("Client Task Exiting!");
     return NULL;

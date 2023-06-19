@@ -80,7 +80,7 @@ static int server_recv_clnt(
         sktfd == INVALID_SOCKET) {
         return -1;
     }
-    TIMEVAL tmout;
+    struct timeval tmout;
     tmout.tv_sec = 1;
     tmout.tv_usec = 0;
     fd_set read_fds;

@@ -173,6 +173,7 @@ int list_remove(list_t *_list, void *_data)
             _list->op->destroy(nd_data);
         }
         node_release(todel);
+        _list->it = node;
         _list->count--;
         break;
     }
@@ -212,18 +213,6 @@ void *list_next(list_t *_list)
         }
         item = _list->it->data;
     } while (0);
-    pthread_mutex_unlock(_list->lock);
-    return item;
-}
-
-void *list_end(list_t *_list)
-{
-    void *item = NULL;
-    if (_list == NULL) {
-        return item;
-    }
-    pthread_mutex_lock(_list->lock);
-    item = _list->tail->data;
     pthread_mutex_unlock(_list->lock);
     return item;
 }

@@ -11,14 +11,14 @@ static server_t *server;
 
 int main()
 {
+    setbuf(stderr,NULL);
     xlog_init();
     node_pool_init(1024);
     client_pool_create(1024);
     server = server_create(1024);
     if (server != NULL) {
         server_start(server);
-        int cnt = 60;
-        while (cnt--) {
+        while (server_running(server)) {
             sleep(1);
         }
         server_destroy(server);

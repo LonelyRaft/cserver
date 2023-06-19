@@ -38,7 +38,7 @@ typedef struct task_vec_t
 
 task_vec_t *task_vec_create()
 {
-    size_t num = proc_num();
+    size_t num = 2; // proc_num();
     if (num == 0 || num > USHRT_MAX) {
         return NULL;
     }

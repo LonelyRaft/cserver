@@ -32,8 +32,6 @@ extern "C"
 
     void *list_next(list_t *_list);
 
-    void *list_end(list_t *_list);
-
 #ifdef __cpluplus
 }
 #endif // __cpluplus

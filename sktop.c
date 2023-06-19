@@ -15,7 +15,7 @@ int socket_reuseaddr(skt_t _sktfd)
 {
     int resue = 1;
     return setsockopt(_sktfd, SOL_SOCKET,
-                      SO_REUSEADDR, &resue, sizeof(resue));
+            SO_REUSEADDR, &resue, sizeof(resue));
 }
 
 int socket_unblock(skt_t _sktfd)
@@ -60,7 +60,6 @@ int socket_saddr2inaddr(
         htonl(_saddr->ipaddr.addr);
     return 0;
 }
-
 #endif // __linux__
 
 #ifdef _WIN32
@@ -91,8 +90,8 @@ int socket_reuseaddr(skt_t _sktfd)
 {
     BOOL opt = TRUE;
     return setsockopt(
-        _sktfd, SOL_SOCKET, SO_REUSEADDR,
-        (char *)&opt, sizeof(BOOL));
+            _sktfd, SOL_SOCKET, SO_REUSEADDR,
+            (char *)&opt, sizeof(BOOL));
 }
 
 int socket_unblock(skt_t _sktfd)
@@ -130,5 +129,5 @@ int socket_saddr2inaddr(
         htonl(_saddr->ipaddr.addr);
     return 0;
 }
-
 #endif // _WIN32
+
