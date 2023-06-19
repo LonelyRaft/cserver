@@ -49,11 +49,6 @@ int socket_saddr2inaddr(
     const saddr_t *_saddr,
     struct sockaddr_in *_inaddr);
 
-/*
-_sktfd: unblock socket
-*/
-int socket_check(skt_t _sktfd);
-
 #ifdef __cplusplus
 }
 #endif // __cplusplus

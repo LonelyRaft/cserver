@@ -96,10 +96,10 @@ void *client_run(task_t *_task)
     while (_task->working) {
         fd_set read;
         FD_ZERO(&read);
-        int maxfd = -1;
+        int maxfd = 0;
         client_t *clnt = (client_t *)list_begin(queue);
         while (clnt != NULL) {
-            if (!socket_check(clnt->sktfd)) {
+            if (clnt->sktfd == INVALID_SOCKET) {
                 list_remove(queue, clnt);
                 clnt = (client_t *)list_next(queue);
                 continue;
@@ -110,7 +110,7 @@ void *client_run(task_t *_task)
             }
             clnt = (client_t *)list_next(queue);
         }
-        if (maxfd < 0) {
+        if (maxfd == 0) {
             sleep(1);
             continue;
         }
