@@ -19,7 +19,7 @@ typedef struct task_t
     unsigned char working;
 } task_t;
 
-task_vec_t *task_vec_create();
+task_vec_t *task_vec_create(int _capcity);
 
 void task_vec_destroy(task_vec_t *_vector);
 

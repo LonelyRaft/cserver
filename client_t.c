@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "pool_t.h"
 #include "client_t.h"
 #include "xlog.h"
@@ -62,7 +63,16 @@ static void client_copy(client_t *_dest, const client_t *_src)
 
 static int client_cmp(const client_t *_a, const client_t *_b)
 {
-    return 0;
+    if (_a == _b) {
+        return 0;
+    }
+    if (_a->sktfd == _b->sktfd) {
+        return 0;
+    }
+    if (_a->sktfd > _b->sktfd) {
+        return 1;
+    }
+    return -1;
 }
 
 list_t *client_list_create()
@@ -93,18 +103,23 @@ void *client_run(task_t *_task)
                 clnt = (client_t *)list_next(queue);
                 continue;
             }
-            char buffer[16];
-            int ret = recv(clnt->sktfd, buffer, 0, 0);
-            if(ret < 0 && errno != EINTR)
-            {
-                list_remove(queue, clnt);
-                // 移除完之后，it 指向哪里？
-            }
+//             char buffer[16];
+//             int ret = recv(clnt->sktfd, buffer, 0, 0);
+//             int error_code = errno;
+//             if (ret < 0 && error_code != EINTR) {
+//                 list_remove(queue, clnt);
+//                 clnt = (client_t *)list_next(queue);
+//                 continue;
+//             }
             FD_SET(clnt->sktfd, &read);
             if (clnt->sktfd > maxfd) {
                 maxfd  = clnt->sktfd;
             }
             clnt = (client_t *)list_next(queue);
+        }
+        if (maxfd == 0) {
+            sleep(1);
+            continue;
         }
         struct timeval tmout;
         tmout.tv_sec = 1;
@@ -127,10 +142,13 @@ void *client_run(task_t *_task)
             char buffer[256];
             int length = recv(clnt->sktfd, buffer, 255, 0);
             if (length < 0) {
+                list_remove(queue, clnt);
                 clnt = (client_t *)list_next(queue);
-                //                list_remove(queue, clnt);
                 continue;
             }
+            buffer[length] = 0;
+            xlogStatus("%s", buffer);
+            send(clnt->sktfd, buffer, length, 0);
             // protocol do something
             clnt = (client_t *)list_next(queue);
         }

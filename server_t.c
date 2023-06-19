@@ -195,7 +195,7 @@ server_t *server_create(unsigned short _port)
     server->run = 0;
     server->interval = 1;
     server->thds =
-        task_vec_create();
+        task_vec_create(2);
     if (server->thds == NULL) {
         xlogError("Create Client Thread Pool Failed!");
         free(server);

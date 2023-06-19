@@ -166,6 +166,12 @@ int list_remove(list_t *_list, void *_data)
             continue;
         }
         node_t *todel = node->next;
+        if (_list->it == todel) {
+            _list->it = node;
+        }
+        if (_list->tail == todel) {
+            _list->tail = node;
+        }
         node->next = todel->next;
         todel->next = NULL;
         todel->data = NULL;
@@ -173,7 +179,6 @@ int list_remove(list_t *_list, void *_data)
             _list->op->destroy(nd_data);
         }
         node_release(todel);
-        _list->it = node;
         _list->count--;
         break;
     }

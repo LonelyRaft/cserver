@@ -36,9 +36,12 @@ typedef struct task_vec_t
     pthread_mutex_t *lock;
 } task_vec_t;
 
-task_vec_t *task_vec_create()
+task_vec_t *task_vec_create(int _capcity)
 {
-    size_t num = 2; // proc_num();
+    size_t num = _capcity;
+    if (_capcity < 0) {
+        num = proc_num();
+    }
     if (num == 0 || num > USHRT_MAX) {
         return NULL;
     }
