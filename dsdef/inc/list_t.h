@@ -20,7 +20,7 @@ extern "C"
 
     size_t list_count(const list_t *_list);
 
-    int list_push(list_t *_list, void *_data);
+    int list_push(list_t *_list, const void *_data);
 
     void *list_top(const list_t *_list);
 

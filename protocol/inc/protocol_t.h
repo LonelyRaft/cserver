@@ -16,6 +16,7 @@ typedef struct protocol_op
 
 typedef struct protocol_t
 {
+    const protocol_op * op;
     unsigned char *recvbuf;
     unsigned char *sendbuf;
     size_t recvsz;
@@ -25,7 +26,6 @@ typedef struct protocol_t
     size_t recv_ridx;
     size_t send_ridx;
 } protocol_t;
-
 
 protocol_t *protocol_create();
 

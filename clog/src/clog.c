@@ -227,7 +227,7 @@ static int clog_write(
     } while (0);
     if (config->b_stdout) {
         if (idx > 0) {
-            fprintf(stderr, "%s%s%s%s\n",
+            fprintf(stderr, "%s%s%s%s",
                 stdfmt[_head->level],
                 header, stdfmt[0], _message);
         } else {

@@ -11,7 +11,7 @@ static server_t *server;
 
 int main()
 {
-    setbuf(stderr,NULL);
+    setbuf(stderr, NULL);
     xlog_init();
     node_pool_init(1024);
     client_pool_create(1024);

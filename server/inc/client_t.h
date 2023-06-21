@@ -6,6 +6,7 @@
 #include "list_t.h"
 #include "sktop.h"
 #include "task_t.h"
+#include "protocol_t.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -14,9 +15,11 @@ extern "C"
 
 typedef struct client_t
 {
-    skt_t sktfd;
-    size_t length;
-    struct sockaddr_in addr;
+    unsigned int type; // client type
+    skt_t intf; // user interface
+    skt_t sktfd; // client socket
+    struct sockaddr_in addr; // client addr
+    protocol_t *pro; // protocol
 } client_t;
 
 int client_pool_create(size_t _capacity);

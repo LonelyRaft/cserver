@@ -84,13 +84,14 @@ size_t list_count(const list_t *_list)
     return result;
 }
 
-int list_push(list_t *_list, void *_data)
+int list_push(list_t *_list, const void *_data)
 {
     if (_list == NULL || _data == NULL) {
         return -1;
     }
     if (_list->op == NULL ||
-        _list->op->create == NULL) {
+        _list->op->create == NULL ||
+        _list->op->copy == NULL) {
         return -2;
     }
     node_t *node = node_lease();
@@ -98,11 +99,12 @@ int list_push(list_t *_list, void *_data)
         return -3;
     }
     node->next = 0;
-    node->data = _list->op->create(_data);
+    node->data = _list->op->create();
     if (node->data == NULL) {
         node_release(node);
         return -4;
     }
+    _list->op->copy(node->data, _data);
     pthread_mutex_lock(_list->lock);
     _list->tail->next = node;
     _list->tail = node;

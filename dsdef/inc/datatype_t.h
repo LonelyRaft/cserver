@@ -7,7 +7,7 @@ extern "C"
 {
 #endif // __cplusplus
 
-#define DATA_CREATE (void *(*)(const void *))
+#define DATA_CREATE (void *(*)())
 
 #define DATA_DESTROY (void (*)(void *))
 
@@ -18,11 +18,11 @@ extern "C"
     typedef struct data_op
     {
         /********************************************
-         * # copy constructor or move constructor
+         * # alloc memory for data
          * @_data: another data
          * @return: new data
          *********************************************/
-        void *(*create)(const void *_data);
+        void *(*create)();
 
         /********************************************
          * # data destructor

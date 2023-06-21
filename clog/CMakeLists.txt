@@ -7,13 +7,14 @@ add_library(
     "readme.md"
 )
 
-file(GLOB CLOG_SRCS *.c *.h)
+file(GLOB CLOG_FLES 
+    ${SRC_DIR}/*.c ${INC_DIR}/*.h)
 target_sources(
     ${CLOG_NAME} PRIVATE
-    ${CLOG_SRCS}
+    ${CLOG_FLES}
 )
 target_include_directories(
     ${CLOG_NAME} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/${INC_DIR}
 )
 
